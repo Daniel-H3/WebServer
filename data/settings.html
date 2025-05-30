@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CBSL - Settings</title>
+<style>
+  @font-face {
+    font-family: 'Orbitron';
+    src: url('Orbitron-Regular.woff2') format('woff2'),
+        url('Orbitron-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  body {
+    margin: 0;
+    background: #0a0f1a;
+    font-family: 'Orbitron', sans-serif;
+    color: #a0cfff;
+    overflow-x: hidden;
+  }
+
+  .container {
+    width: auto;
+    margin: 15px;
+    padding: 20px;
+    background: rgba(10, 15, 26, 0.8);
+    border: 2px solid #1a9cff;
+    border-radius: 12px;
+    box-shadow: 0 0 20px #1a9cff;
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #1a9cff;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+
+  header h1 {
+    font-size: 1.8rem;
+    color: #1a9cff;
+    letter-spacing: 2px;
+  }
+
+  nav a {
+    color: #a0cfff;
+    text-decoration: none;
+    margin-left: 20px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: color 0.3s ease;
+  }
+
+  nav a:hover {
+    color: #1a9cff;
+  }
+
+  .toggle-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .toggle-item {
+    flex: 1 1 40%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(26, 156, 255, 0.1);
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px #1a9cff88 inset;
+  }
+
+  .toggle-item label {
+    font-size: 1.1rem;
+    user-select: none;
+  }
+
+  /* Toggle Switch */
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+  }
+
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #555;
+    transition: 0.4s;
+    border-radius: 34px;
+    box-shadow: 0 0 5px #1a9cff88;
+  }
+
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: #0a0f1a;
+    transition: 0.4s;
+    border-radius: 50%;
+    box-shadow: 0 0 5px #1a9cffcc;
+  }
+
+  input:checked + .slider {
+    background-color: #1a9cff;
+    box-shadow: 0 0 15px #1a9cff;
+  }
+
+  input:checked + .slider:before {
+    transform: translateX(24px);
+  }
+
+  /* Interval input */
+  .interval-group {
+    margin-top: 2px;
+    margin-bottom: 2px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .interval-group label {
+    font-size: 1.1rem;
+  }
+
+  .interval-group input[type="number"] {
+    width: 130px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #1a9cff;
+    background: #0a0f1a;
+    color: #a0cfff;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1rem;
+    box-shadow: 0 0 10px #1a9cff88 inset;
+  }
+
+  /* Save button */
+  .save-button {
+    margin-top: 30px;
+    padding: 12px 30px;
+    background-color: #1a9cff;
+    border: none;
+    border-radius: 8px;
+    color: #0a0f1a;
+    font-weight: 700;
+    font-size: 1.2rem;
+    cursor: pointer;
+    box-shadow: 0 0 15px #1a9cff;
+    transition: background-color 0.3s ease;
+  }
+
+  .save-button:hover {
+    background-color: #0d7adf;
+  }
+
+  /* Footer */
+
+  footer {
+    margin-top: 40px;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #a0cfff;
+  }
+
+  /* Background grid effect */
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(circle at center, #1a9cff22 1px, transparent 1px),
+                radial-gradient(circle at center, #1a9cff22 1px, transparent 1px);
+    background-position: 0 0, 25px 25px;
+    background-size: 50px 50px;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .label-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .port-select {
+    width: 100px;
+  }
+
+  .toggle-item select {
+    background-color: #0a0f1a;
+    color: #a0cfff;
+    border: 1px solid #1a9cff;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1rem;
+    box-shadow: 0 0 10px #1a9cff88 inset;
+    transition: border-color 0.3s ease;
+  }
+
+  .toggle-item select:disabled {
+    opacity: 0.5;
+  }
+
+  .status-text {
+    margin: 5px 0 0 0;
+    color: #1a9cff;
+    font-weight: bold;
+    font-size: 0.95rem;
+  }
+
+</style>
+</head>
+<body>
+  <div class="container" role="main">
+    <header>
+      <h1>Computer Based Science Learning</h1>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="settings.html" class="active">Settings</a>
+      </nav>
+    </header>
+
+    <main>
+      <section aria-label="Settings">
+        <section class="toggle-group" aria-label="Toggle switches for parameters">
+          <div class="toggle-item">
+            <div class="label-group">
+              <label for="arus">AC/DC Current (Arus AC/DC)</label>
+              <section class="interval-group" aria-label="Interval input">
+                <input type="number" id="interval-arus" min="100" placeholder="Interval (ms)"/>
+              </section>
+              <select id="arus-port" class="port-select" disabled>
+                <option value="N">None</option>
+                <option value="A">Port A</option>
+                <option value="B">Port B</option>
+                <option value="C">Port C</option>
+              </select>              
+            </div>            
+            <label class="switch">
+              <input type="checkbox" id="arus" />
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="toggle-item">
+            <div class="label-group">
+              <label for="bunyi">Sound (Bunyi)</label>
+              <section class="interval-group" aria-label="Interval input">
+                <input type="number" id="interval-bunyi" min="100" placeholder="Interval (ms)"/>
+              </section>
+              <select id="bunyi-port" class="port-select" disabled>
+                <option value="N">None</option>
+                <option value="A">Port A</option>
+                <option value="B">Port B</option>
+                <option value="C">Port C</option>
+              </select>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="bunyi" />
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="toggle-item">
+            <div class="label-group">
+              <label for="cahaya">Light Intensity (Intensitas Cahaya)</label>
+              <section class="interval-group" aria-label="Interval input">
+                <input type="number" id="interval-cahaya" min="100" placeholder="Interval (ms)"/>
+              </section>
+              <p id="status-cahaya" class="status-text">I2C port inactive</p>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="cahaya" />
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="toggle-item">
+            <div class="label-group">
+              <label for="gaya">Force (Gaya)</label>
+              <section class="interval-group" aria-label="Interval input">
+                <input type="number" id="interval-gaya" min="100" placeholder="Interval (ms)"/>
+              </section>
+              <select id="gaya-port" class="port-select" disabled>
+                <option value="N">None</option>
+                <option value="A">Port A</option>
+                <option value="B">Port B</option>
+                <option value="C">Port C</option>
+              </select>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="gaya" />
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="toggle-item">
+            <div class="label-group">
+              <label for="jarak">Distance (Jarak)</label>
+              <section class="interval-group" aria-label="Interval input">
+                <input type="number" id="interval-jarak" min="100" placeholder="Interval (ms)"/>
+              </section>
+              <select id="jarak-port" class="port-select" disabled>
+                <option value="N">None</option>
+                <option value="A">Port A</option>
+                <option value="B">Port B</option>
+                <option value="C">Port C</option>
+              </select>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="jarak" />
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="toggle-item">
+            <div class="label-group">
+              <label for="teganganAC">AC Voltage (Tegangan AC)</label>
+              <section class="interval-group" aria-label="Interval input">
+                <input type="number" id="interval-teganganAC" min="100" placeholder="Interval (ms)"/>
+              </section>
+              <select id="teganganAC-port" class="port-select" disabled>
+                <option value="N">None</option>
+                <option value="A">Port A</option>
+                <option value="B">Port B</option>
+                <option value="C">Port C</option>
+              </select>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="teganganAC" />
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="toggle-item">
+            <div class="label-group">
+              <label for="teganganDC">DC Voltage (Tegangan DC)</label>
+              <section class="interval-group" aria-label="Interval input">
+                <input type="number" id="interval-teganganDC" min="100" placeholder="Interval (ms)"/>
+              </section>
+              <p id="status-teganganDC" class="status-text">I2C port inactive</p>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="teganganDC" />
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="toggle-item">
+            <div class="label-group">
+              <label for="temperatur">Temperature (Suhu)</label>
+              <section class="interval-group" aria-label="Interval input">
+                <input type="number" id="interval-temperatur" min="100" placeholder="Interval (ms)"/>
+              </section>
+              <select id="temperatur-port" class="port-select" disabled>
+                <option value="N">None</option>
+                <option value="A">Port A</option>
+                <option value="B">Port B</option>
+                <option value="C">Port C</option>
+              </select>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="temperatur" />
+              <span class="slider"></span>
+            </label>
+          </div>
+        </section>
+
+        <!-- <section class="interval-group" aria-label="Interval input">
+          <label for="interval">Interval</label>
+          <input type="number" id="interval" name="interval" min="0" placeholder="Enter interval" />
+        </section> -->
+
+
+        <button class="save-button" type="button" aria-label="Save settings">SAVE</button>
+      </section>
+    </main>
+
+    <footer>
+      &copy; 2024 Computer Based Science Learning (Pembelajaran Sains Berbasis Komputer)
+    </footer>
+  </div>
+  <script>
+    // Ambil pengaturan dari ESP32 saat halaman dimuat
+    document.addEventListener('DOMContentLoaded', () => {
+
+      fetch('/settings.json?t=' + new Date().getTime())
+        .then(res => res.json())
+        .then(settings => {
+          for (const key in settings) {
+            const el = document.getElementById(key.replace('_port', '-port'));
+
+            if (!el) continue;
+
+            // Toggle checkbox
+            if (el.type === 'checkbox') {
+              el.checked = settings[key];
+
+              const portSelect = document.getElementById(`${el.id}-port`);
+              if (portSelect) portSelect.disabled = !settings[key];
+
+              if (el.id === 'cahaya' || el.id === 'teganganDC') {
+                updateI2CStatus(el.id, el.checked);
+              }
+            }
+
+            // Port dropdown or number input
+            if (el.tagName === 'SELECT' || el.type === 'number') {
+              el.value = settings[key];
+            }
+          }
+
+          // Sync ke localStorage juga
+          localStorage.setItem('thunderflowSettings', JSON.stringify(settings));
+        });
+    });
+
+    // Kirim pengaturan ke ESP32 saat tombol SAVE ditekan
+    document.querySelector('.save-button').addEventListener('click', () => {
+    const settings = {};
+
+    // Ambil semua checkbox dan port terkait
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(cb => {
+      const id = cb.id;
+      const portSelect = document.getElementById(`${id}-port`);
+      settings[id] = cb.checked;
+      settings[`${id}_port`] = portSelect ? portSelect.value : "";
+    });
+
+    // Ambil input tambahan seperti interval
+    const additionalInputs = document.querySelectorAll('input[type="number"], select:not([id$="-port"])');
+    additionalInputs.forEach(input => {
+      settings[input.id] = input.value;
+    });
+
+    // Kirim ke ESP32
+    fetch('/save-settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(settings)
+    }).then(() => {
+      localStorage.setItem('thunderflowSettings', JSON.stringify(settings));
+      alert('Settings saved!');
+    }).catch(() => {
+      alert('Failed to save settings.');
+    });
+  });
+  </script>
+
+  <script>
+    function updateI2CStatus(id, isChecked) {
+      const statusElem = document.getElementById(`status-${id}`);
+      if (statusElem) {
+        statusElem.textContent = isChecked ? "I2C port active" : "I2C port inactive";
+        statusElem.style.color = isChecked ? "#33ff99" : "#ff6666";
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const cahayaToggle = document.getElementById("cahaya");
+      const teganganDCToggle = document.getElementById("teganganDC");
+
+      cahayaToggle.addEventListener("change", () => {
+        updateI2CStatus("cahaya", cahayaToggle.checked);
+      });
+
+      teganganDCToggle.addEventListener("change", () => {
+        updateI2CStatus("teganganDC", teganganDCToggle.checked);
+      });
+
+      // Jalankan saat awal untuk sync status
+      updateI2CStatus("cahaya", cahayaToggle.checked);
+      updateI2CStatus("teganganDC", teganganDCToggle.checked);
+    });
+  </script>
+
+  <script>
+    const maxActiveToggles = 3;
+
+    const checkboxes = Array.from(document.querySelectorAll('input[type="checkbox"]'));
+
+    document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+      checkbox.addEventListener('change', () => {
+        const checkedCount = Array.from(document.querySelectorAll('input[type="checkbox"]'))
+                                  .filter(cb => cb.checked).length;
+
+        if (checkedCount > maxActiveToggles) {
+          // Batalkan perubahan jika lebih dari batas
+          checkbox.checked = false;
+          alert(`Maksimal hanya boleh memilih ${maxActiveToggles} parameter.`);
+        }
+      });
+    });
+  </script>
+  <script>
+    // Aktifkan/Nonaktifkan port dropdown berdasarkan toggle
+    document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+      checkbox.addEventListener('change', () => {
+        const portSelect = document.getElementById(`${checkbox.id}-port`);
+        if (portSelect) {
+          portSelect.disabled = !checkbox.checked;
+        }
+      });
+    });
+  </script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const portSelects = document.querySelectorAll('select[id$="-port"]');
+
+      function updatePortOptions() {
+        const selectedPorts = Array.from(portSelects).map(select => select.value);
+
+        portSelects.forEach(currentSelect => {
+          const currentValue = currentSelect.value;
+          currentSelect.querySelectorAll("option").forEach(option => {
+            option.disabled = false; // Aktifkan semua dulu
+            // Abaikan opsi "None"
+            if (option.value !== currentValue && option.value !== "N" && selectedPorts.includes(option.value)) {
+              option.disabled = true;
+            }
+          });
+        });
+      }
+
+      portSelects.forEach(select => {
+        select.addEventListener("change", updatePortOptions);
+      });
+
+      updatePortOptions(); // Jalankan saat awal halaman dimuat
+    });
+  </script>
+</body>
+</html>
