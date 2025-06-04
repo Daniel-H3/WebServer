@@ -328,11 +328,11 @@
           </div>
           <div class="toggle-item">
             <div class="label-group">
-              <label for="teganganAC">AC Voltage (Tegangan AC)</label>
+              <label for="tegangan">AC/DC Voltage (Tegangan AC/DC)</label>
               <section class="interval-group" aria-label="Interval input">
-                <input type="number" id="interval-teganganAC" min="100" placeholder="Interval (ms)"/>
+                <input type="number" id="interval-tegangan" min="100" placeholder="Interval (ms)"/>
               </section>
-              <select id="teganganAC-port" class="port-select" disabled>
+              <select id="tegangan-port" class="port-select" disabled>
                 <option value="N">None</option>
                 <option value="A">Port A</option>
                 <option value="B">Port B</option>
@@ -340,12 +340,13 @@
               </select>
             </div>
             <label class="switch">
-              <input type="checkbox" id="teganganAC" />
+              <input type="checkbox" id="tegangan" />
               <span class="slider"></span>
             </label>
           </div>
           <div class="toggle-item">
-            <div class="label-group">
+            <button class="save-button" type="button" aria-label="Save settings">SAVE</button>
+            <!-- <div class="label-group">
               <label for="teganganDC">DC Voltage (Tegangan DC)</label>
               <section class="interval-group" aria-label="Interval input">
                 <input type="number" id="interval-teganganDC" min="100" placeholder="Interval (ms)"/>
@@ -355,7 +356,7 @@
             <label class="switch">
               <input type="checkbox" id="teganganDC" />
               <span class="slider"></span>
-            </label>
+            </label> -->
           </div>
           <div class="toggle-item">
             <div class="label-group">
@@ -376,14 +377,6 @@
             </label>
           </div>
         </section>
-
-        <!-- <section class="interval-group" aria-label="Interval input">
-          <label for="interval">Interval</label>
-          <input type="number" id="interval" name="interval" min="0" placeholder="Enter interval" />
-        </section> -->
-
-
-        <button class="save-button" type="button" aria-label="Save settings">SAVE</button>
       </section>
     </main>
 
@@ -410,7 +403,7 @@
               const portSelect = document.getElementById(`${el.id}-port`);
               if (portSelect) portSelect.disabled = !settings[key];
 
-              if (el.id === 'cahaya' || el.id === 'teganganDC') {
+              if (el.id === 'cahaya' /*|| el.id === 'teganganDC'*/) {
                 updateI2CStatus(el.id, el.checked);
               }
             }
@@ -470,19 +463,19 @@
 
     document.addEventListener("DOMContentLoaded", () => {
       const cahayaToggle = document.getElementById("cahaya");
-      const teganganDCToggle = document.getElementById("teganganDC");
+      //const teganganDCToggle = document.getElementById("teganganDC");
 
       cahayaToggle.addEventListener("change", () => {
         updateI2CStatus("cahaya", cahayaToggle.checked);
       });
 
-      teganganDCToggle.addEventListener("change", () => {
-        updateI2CStatus("teganganDC", teganganDCToggle.checked);
-      });
+      // teganganDCToggle.addEventListener("change", () => {
+      //   updateI2CStatus("teganganDC", teganganDCToggle.checked);
+      // });
 
       // Jalankan saat awal untuk sync status
       updateI2CStatus("cahaya", cahayaToggle.checked);
-      updateI2CStatus("teganganDC", teganganDCToggle.checked);
+      // updateI2CStatus("teganganDC", teganganDCToggle.checked);
     });
   </script>
 

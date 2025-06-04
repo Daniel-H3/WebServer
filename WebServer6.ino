@@ -216,10 +216,10 @@ void setup(){
     DynamicJsonDocument response(256);
     if (settingsDoc["bunyi"]) response["Bunyi"] = random(10, 100);
     if (settingsDoc["gaya"]) response["Gaya"] = random(20, 90);
-    if (settingsDoc["teganganAC"]) response["Tegangan AC"] = random(40, 70);
+    if (settingsDoc["tegangan"]) response["Tegangan AC/DC"] = random(40, 70);
     if (settingsDoc["temperatur"]) response["Temperatur"] = random(25, 35);
     
-    if (settingsDoc["teganganDC"]) response["Tegangan DC"] = random(25, 35);
+    // if (settingsDoc["teganganDC"]) response["Tegangan DC"] = random(25, 35);
     if (settingsDoc["jarak"]) response["Jarak"] = random(25, 35);
     if (settingsDoc["cahaya"]) response["Cahaya"] = random(25, 35);
     if (settingsDoc["arus"]) response["Arus AC/DC"] = random(25, 35);

@@ -425,8 +425,8 @@
       'Cahaya': '#33cc33',
       'Gaya': '#ff9933',
       'Jarak': '#cc33ff',
-      'Tegangan AC': '#ff33cc',
-      'Tegangan DC': '#3399ff',
+      'Tegangan AC/DC': '#ff33cc',
+      //'Tegangan DC': '#3399ff',
       'Temperatur': '#ffcc33'
     };
     
@@ -436,8 +436,8 @@
       "Cahaya": { unit: "lux", full: "Lux" },
       "Gaya": { unit: "N", full: "Newton" },
       "Jarak": { unit: "cm", full: "Centimeter" },
-      "Tegangan AC": { unit: "V", full: "Volt" },
-      "Tegangan DC": { unit: "V", full: "Volt" },
+      "Tegangan AC/DC": { unit: "V", full: "Volt" },
+      // "Tegangan DC": { unit: "V", full: "Volt" },
       "Temperatur": { unit: "°C", full: "Derajat Celcius" }
     };
 
@@ -621,8 +621,8 @@
       if (settings.cahaya) enabledParams.push('Cahaya');
       if (settings.gaya) enabledParams.push('Gaya');
       if (settings.jarak) enabledParams.push('Jarak');
-      if (settings.teganganAC) enabledParams.push('Tegangan AC');
-      if (settings.teganganDC) enabledParams.push('Tegangan DC');
+      if (settings.tegangan) enabledParams.push('Tegangan AC/DC');
+      //if (settings.teganganDC) enabledParams.push('Tegangan DC');
       if (settings.temperatur) enabledParams.push('Temperatur');
       //if (settings.interval) logIntervalMs = parseInt(settings.interval) || 2000;
       logIntervalsByParam = {
@@ -631,8 +631,8 @@
         "Cahaya": parseInt(settings["interval-cahaya"]) || 2000,
         "Gaya": parseInt(settings["interval-gaya"]) || 2000,
         "Jarak": parseInt(settings["interval-jarak"]) || 2000,
-        "Tegangan AC": parseInt(settings["interval-teganganAC"]) || 2000,
-        "Tegangan DC": parseInt(settings["interval-teganganDC"]) || 2000,
+        "Tegangan AC/DC": parseInt(settings["interval-tegangan"]) || 2000,
+        // "Tegangan DC": parseInt(settings["interval-teganganDC"]) || 2000,
         "Temperatur": parseInt(settings["interval-temperatur"]) || 2000
       };
       if (settings.xUnit) xUnit = settings.xUnit;
@@ -693,7 +693,8 @@
       else xVal = (timeIndex * intervalMs) / 60000;
 
       const now = new Date();
-      const timeLabel = now.toISOString().slice(11, 23);// "HH:mm:ss.SSS"
+      const timeLabel = now.toLocaleTimeString('id-ID', { hour12: false }) + '.' + 
+                        now.getMilliseconds().toString().padStart(3, '0');
       //const timeLabel = now.toLocaleTimeString() + '.' + now.getMilliseconds().toString().padStart(3, '0');
       
 
