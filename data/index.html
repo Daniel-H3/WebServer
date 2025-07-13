@@ -394,6 +394,10 @@
             <button id="exportBtn" class="control-btn">EXPORT</button>
             <button id="stopBtn" class="control-btn">STOP</button>
             <button id="runBtn" class="control-btn">RUN</button>
+            <button id="pauseBtn" class="control-btn">PAUSE</button>
+            <span id="scopeStatus" style="margin-left: 10px; color: limegreen;">Running</span>
+
+            <!-- <button id="scopeBtn" class="control-btn">SCOPE MODE</button> -->
           </div>
           <div class="timestamp-container" style="margin-top: 20px;">
               <h3>TIMESTAMP</h3>
@@ -502,19 +506,30 @@
 
         const controls = document.createElement("div");
         controls.className = "scale-controls";
-        controls.innerHTML = `
-          <label>X Min:<input type="number" id="xMin-${id}" value="0" step="1"/></label>
-          <label>X Max:<input type="number" id="xMax-${id}" value="10" step="1"/></label>
-          <label>X Unit:
-            <select id="xUnit-${id}">
-              <option value="ms">ms</option>
-              <option value="s" selected>second</option>
-              <option value="min">minutes</option>
-            </select>
-          </label>
-          <label>Y Min:<input type="number" id="yMin-${id}" value="0" step="1"/></label>
-          <label>Y Max:<input type="number" id="yMax-${id}" value="100" step="1"/></label>
-        `;
+                  
+          if (param === "Tegangan AC/DC" || param === "Arus AC/DC") {
+          controls.innerHTML += `
+            <label>Time/Div (ms/div): <input type="number" id="timeDiv-${id}" value="10" min="1" max="500" step="1" /></label>
+            <label>Volt/Div (V/div): <input type="number" id="voltDiv-${id}" value="1" min="0.1" max="50" step="0.1" /></label>
+            <label for="offset-${id}">Offset (V):</label>
+            <input type="number" id="offset-${id}" step="0.1" value="0" />
+            `;
+          } else{
+            controls.innerHTML = `
+            <label>X Min:<input type="number" id="xMin-${id}" value="0" step="1"/></label>
+            <label>X Max:<input type="number" id="xMax-${id}" value="10" step="1"/></label>
+            <label>X Unit:
+              <select id="xUnit-${id}">
+                <option value="ms">ms</option>
+                <option value="s" selected>second</option>
+                <option value="min">minutes</option>
+              </select>
+            </label>
+            <label>Y Min:<input type="number" id="yMin-${id}" value="0" step="1"/></label>
+            <label>Y Max:<input type="number" id="yMax-${id}" value="100" step="1"/></label>
+            `;
+          }
+
 
         // ==== SUSUN BLOK ====
         block.appendChild(chartContainer);
@@ -553,8 +568,37 @@
               }
             },
             scales: {
-              x: { type: 'linear', min: 0, max: 10, title: { display: true, text: `Time (${xUnit})` } },
-              y: { beginAtZero: false, min: 0, max: 100, title: { display: true, text: `${param} (${full} (${unit}))` } }
+              // x: { type: 'linear', min: 0, max: 10, title: { display: true, text: `Time (${xUnit})` } },
+              // y: { beginAtZero: false, min: 0, max: 100, title: { display: true, text: `${param} (${full} (${unit}))` } }
+              x: {
+                type: 'linear',
+                title: {
+                  display: true,
+                  text: 'Time (ms)'
+                },
+                grid: {
+                  drawTicks: true,
+                  color: '#ccc',
+                  lineWidth: 1
+                },
+                ticks: {
+                  stepSize: 10 // akan diganti di plotOscilloscope()
+                }
+              },
+              y: {
+                title: {
+                  display: true,
+                  text: 'Voltage (V)'
+                },
+                grid: {
+                  drawTicks: true,
+                  color: '#ccc',
+                  lineWidth: 1
+                },
+                ticks: {
+                  stepSize: 1 // akan diganti di plotOscilloscope()
+                }
+              }
             }
           }
         });
@@ -779,33 +823,60 @@
           const maxRows = Math.max(...Object.values(timestampMatrix).map(arr => arr.length));
           timestampRowCount = maxRows;
 
-          // // Kosongkan tbody
-          // tbody = document.getElementById("timestampBody");
-          // tbody.innerHTML = "";
-
-          // // Render ulang seluruh isi tabel berdasarkan timestampMatrix
-          // for (let i = 0; i < maxRows; i++) {
-          //   const row = tbody.insertRow();
-          //   for (const p of Object.keys(timestampMatrix)) {
-          //     const entry = timestampMatrix[p][i];
-          //     const cellTime = row.insertCell();
-          //     const cellVal = row.insertCell();
-          //     if (entry) {
-          //       cellTime.textContent = entry.time;
-          //       cellVal.textContent = entry.value;
-          //     } else {
-          //       cellTime.textContent = "-";
-          //       cellVal.textContent = "-";
-          //     }
-          //   }
-          // }
-
           updateGauge(param, sensorValue, min, max, unit);
         })
         .catch(error => {
           console.error(`Error fetching data for ${param}:`, error);
         });
     }
+    
+    function plotOscilloscope(param, values) {
+      
+      const id = param.replace(/[^\w]/g, '');
+
+      const chart = chartsByParam[param];
+      if (!chart) {
+        console.warn(`Chart for ${param} not found`); 
+        return;
+      }
+
+      const timeDivInput = document.getElementById(`timeDiv-${id}`);
+      const voltDivInput = document.getElementById(`voltDiv-${id}`);
+      const offsetInput = document.getElementById(`offset-${id}`);
+
+      const timeDiv = Math.max(1, parseFloat(timeDivInput.value) || 10);     // minimal 1 ms/div
+      const voltDiv = Math.max(0.1, parseFloat(voltDivInput.value) || 1);    // minimal 0.1 V/div
+      const offset = parseFloat(offsetInput?.value || 0);
+
+      const totalTime = timeDiv * 1;
+      const totalVolt = voltDiv * 10;
+      const xStep = 1;
+
+      const waveform = values.map((val, i) => ({
+        x: i * xStep,
+        y: val + offset
+      }));
+
+
+      const dataset = datasetsByParam[param];
+      if (!dataset) {
+        console.warn(`Dataset for ${param} not found`);
+        return;
+      }
+      dataset.data = waveform;
+
+      chart.options.scales.x.min = 0;
+      chart.options.scales.x.max = totalTime;
+      chart.options.scales.y.min = -totalVolt / 2;
+      chart.options.scales.y.max = totalVolt / 2;
+      chart.options.scales.x.ticks.stepSize = totalTime / 10;
+      chart.options.scales.y.ticks.stepSize = totalVolt / 10;
+      chart.options.scales.x.title.text = `Time (ms)`;
+      chart.options.scales.y.title.text = `Voltage (V)`;
+
+      chart.update();
+    }
+
     function startLogging() {
       parameterStats = {};
       if (logging) {
@@ -964,8 +1035,65 @@
       pdf.save('Praktikum_Test.pdf');
     }
 
+    let isPaused = false;
+
     // Initialize everything on DOMContentLoaded
     document.addEventListener('DOMContentLoaded', () => {
+      // let lastBurstData = {};
+
+      // document.getElementById("scopeBtn").addEventListener("click", () => {
+      //   fetch("/burst")
+      //     .then(res => res.json())
+      //     .then(data => {
+      //       lastBurstData = data;
+      //       if (data["Tegangan AC/DC"]) {
+      //         plotOscilloscope("Tegangan AC/DC", data["Tegangan AC/DC"]);
+      //       }
+      //       if (data["Arus AC/DC"]) {
+      //         plotOscilloscope("Arus AC/DC", data["Arus AC/DC"]);
+      //       }
+      //     });
+      // });
+
+      let lastBurstData = {};
+
+      function fetchAndPlotScope() {
+        fetch("/burst")
+          .then(res => res.json())
+          .then(data => {
+            lastBurstData = data;
+            // Only plot if the parameter is enabled and chart exists
+            const enabledParams = getEnabledParameters();
+            if (data["Tegangan AC/DC"]) {
+              plotOscilloscope("Tegangan AC/DC", data["Tegangan AC/DC"]);
+            }
+            if (data["Arus AC/DC"]) {
+              plotOscilloscope("Arus AC/DC", data["Arus AC/DC"]);
+            }
+          })
+          .catch(error => {
+            console.error("Error fetching burst data:", error);
+          });
+      }
+
+      // Auto-refresh setiap 500ms
+      // setInterval(fetchAndPlotScope, 500);
+      setInterval(() => {
+        if (!isPaused) {
+          fetchAndPlotScope();
+          document.getElementById("scopeStatus").textContent = "Running";
+          document.getElementById("scopeStatus").style.color = "limegreen";
+        } else {
+          document.getElementById("scopeStatus").textContent = "Paused";
+          document.getElementById("scopeStatus").style.color = "orange";
+        }
+      }, 500);
+      
+      document.getElementById("pauseBtn").addEventListener("click", () => {
+        isPaused = !isPaused;
+        document.getElementById("pauseBtn").textContent = isPaused ? "RESUME" : "PAUSE";
+      });
+
       createIndividualParamBlocks();
       document.getElementById('runBtn').addEventListener('click', () => {
         startLogging();
@@ -977,6 +1105,14 @@
 
       document.getElementById('exportBtn').addEventListener('click', () => {
         exportToPDF();
+      });
+      document.querySelectorAll('[id^="timeDiv-"], [id^="voltDiv-"]').forEach(el => {
+        el.addEventListener("change", () => {
+          const param = el.id.includes('arus') ? 'Arus AC/DC' : 'Tegangan AC/DC';
+          if (lastBurstData[param]) {
+            plotOscilloscope(param, lastBurstData[param]);
+          }
+        });
       });
     });
   </script>

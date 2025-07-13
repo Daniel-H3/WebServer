@@ -130,6 +130,15 @@ void loadSettings() {
   }
 }
 
+  float sine_gen() {            //SINE WAVE GEN
+    int angle = angle + 1;  if (angle > 360) angle = 0;
+    //sine = 50 * sin((angle * PI / 180));
+    float sine = 50 * sin(angle * 0.0174532925);
+    Serial.print(sine);
+    return sine;
+    //sine = abs(sine);
+  }
+  
 void setup(){
   // Serial port for debugging purposes
   Serial.begin(115200);
@@ -229,25 +238,27 @@ void setup(){
     request->send(200, "application/json", json);
   });
 
-  /*  server.on("/data", HTTP_GET, [](AsyncWebServerRequest *request){
-      String json = "{";
-      json += "\"Bunyi\":" + String(random(20, 80)) + ",";
-      json += "\"Gaya\":" + String(random(20, 80)) + ",";
-      json += "\"Tegangan AC\":" + String(random(30, 90)) + ",";
-      json += "\"Temperatur\":" + String(random(15, 40)) + ",";
-      json += "\"Tegangan DC\":" + String(random(15, 40)) + ",";
-      json += "\"Cahaya\":" + String(random(15, 40)) + ",";
-      json += "\"Jarak\":" + String(random(15, 40)) + ",";
-      json += "\"Arus AC/DC\":" + String(random(15, 40));
-      json += "}";
-    request->send(200, "application/json", json);
+  server.on("/burst", HTTP_GET, [](AsyncWebServerRequest *request){
+  const int numSamples = 500; // atau configurable dari client
+  const int samplingInterval = 1; // 1ms
 
-    if (settingsDoc["bunyi"]) {
-  String port = settingsDoc["bunyi_port"]; // "A", "B", atau "C"
-  if (port == "A") digitalWrite(GPIO_BUNYI_A, HIGH);
-  else if (port == "B") digitalWrite(GPIO_BUNYI_B, HIGH);
-}
-  });*/
+  StaticJsonDocument<4096> json;
+  JsonArray arusArray = json.createNestedArray("Arus AC/DC");
+  JsonArray teganganArray = json.createNestedArray("Tegangan AC/DC");
+
+  for (int i = 0; i < numSamples; i++) {
+    float arus = random(2, 10); // fungsi buat ambil arus
+    float tegangan = random(10, 27); // fungsi buat ambil tegangan
+    arusArray.add(arus);
+    teganganArray.add(tegangan);
+    delay(samplingInterval);
+  }
+
+  String output;
+  serializeJson(json, output);
+  request->send(200, "application/json", output);
+});
+
 
     // Start server
   server.begin();
